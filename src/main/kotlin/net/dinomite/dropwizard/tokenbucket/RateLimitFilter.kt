@@ -1,4 +1,4 @@
-package org.zivver.dropwizard.ratelimit
+package net.dinomite.dropwizard.tokenbucket
 
 import java.io.IOException
 import javax.servlet.http.HttpServletRequest

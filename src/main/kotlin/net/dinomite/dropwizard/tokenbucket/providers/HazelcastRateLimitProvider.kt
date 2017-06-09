@@ -1,4 +1,4 @@
-package org.zivver.dropwizard.ratelimit.providers
+package net.dinomite.dropwizard.tokenbucket.providers
 
 import com.hazelcast.config.Config
 import com.hazelcast.core.Hazelcast
@@ -9,7 +9,7 @@ import io.github.bucket4j.grid.GridBucketState
 import io.github.bucket4j.grid.ProxyManager
 import io.github.bucket4j.grid.jcache.JCache
 import io.github.bucket4j.grid.jcache.JCacheBucketBuilder
-import org.zivver.dropwizard.ratelimit.RateLimitProvider
+import net.dinomite.dropwizard.tokenbucket.RateLimitProvider
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier

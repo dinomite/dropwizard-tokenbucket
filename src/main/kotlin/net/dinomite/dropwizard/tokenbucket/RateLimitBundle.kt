@@ -1,4 +1,4 @@
-package org.zivver.dropwizard.ratelimit
+package net.dinomite.dropwizard.tokenbucket
 
 import io.dropwizard.Bundle
 import io.dropwizard.setup.Bootstrap
