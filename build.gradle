@@ -1,11 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'kotlin'
-
 buildscript {
   ext.kotlin_version = '1.1.2-4'
 
   repositories {
-    mavenCentral()
+    jcenter()
   }
 
   dependencies {
@@ -13,30 +10,82 @@ buildscript {
   }
 }
 
-version = "1.0.0"
+plugins {
+  id 'java-library'
+  id 'maven-publish'
+  id 'com.jfrog.bintray' version '1.7.2'
+  id 'net.researchgate.release' version '2.4.1'
+  id 'maven'
+}
+apply plugin: 'kotlin'
+
+group 'net.dinomite'
+version project.version
+
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-  mavenCentral()
   jcenter()
 }
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-  compile "com.github.vladimir-bukhtoyarov:bucket4j-jcache:2.0.0"
-  compile "com.hazelcast:hazelcast:3.7.5"
-  compile "com.hazelcast:hazelcast-client:3.7.5"
-  compile "javax.cache:cache-api:1.0.0"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+  implementation "com.github.vladimir-bukhtoyarov:bucket4j-jcache:2.0.0"
+
   compileOnly "io.dropwizard:dropwizard-core:1.0.5"
 }
 
-jar {
-  manifest {
-    attributes(
-      "Implementation-Title": "Dropwizard-Ratelimit",
-      "Implementation-Version": version,
-      "Implementation-Vendor": "ZIVVER B.V."
-      )
-  }
+task sourceJar(type: Jar, dependsOn: classes) {
+  from sourceSets.main.allSource
+}
 
-  from "LICENSE"
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  from javadoc.destinationDir
+}
+
+publishing {
+  publications {
+    bintray(MavenPublication) {
+      from components.java
+      groupId project.group
+      artifactId project.name
+      version project.version
+
+      artifact sourceJar {
+        classifier 'sources'
+      }
+
+      artifact javadocJar {
+        classifier 'javadoc'
+      }
+    }
+  }
+}
+
+release {
+  tagTemplate = 'v$version'
+  afterReleaseBuild.dependsOn bintrayUpload
+}
+
+bintray {
+  user = System.getenv('BINTRAY_USER')
+  key = System.getenv('BINTRAY_KEY')
+  publications = ['bintray']
+
+  pkg {
+    repo = 'maven'
+    licenses = ['Apache-2.0']
+    vcsUrl = 'https://github.com/dinomite/dropwizard-tokenbucket'
+    name = 'net.dinomite.dropwizard-tokenbucket'
+
+    version {
+      name = project.version
+      released = new Date()
+      vcsTag = 'v' + project.version
+    }
+  }
+}
+
+sourceSets {
+  main.java.srcDirs += 'src/main/kotlin'
 }
