@@ -1,0 +1,42 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+buildscript {
+  ext.kotlin_version = '1.1.2-4'
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+version = "1.0.0"
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+  compile "com.github.vladimir-bukhtoyarov:bucket4j-jcache:2.0.0"
+  compile "com.hazelcast:hazelcast:3.7.5"
+  compile "com.hazelcast:hazelcast-client:3.7.5"
+  compile "javax.cache:cache-api:1.0.0"
+  compileOnly "io.dropwizard:dropwizard-core:1.0.5"
+}
+
+jar {
+  manifest {
+    attributes(
+      "Implementation-Title": "Dropwizard-Ratelimit",
+      "Implementation-Version": version,
+      "Implementation-Vendor": "ZIVVER B.V."
+      )
+  }
+
+  from "LICENSE"
+}
