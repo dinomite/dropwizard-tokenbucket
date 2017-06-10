@@ -1,55 +1,21 @@
-## Dropwizard Ratelimit
+## Dropwizard Tokenbucket
 
-
-Dropwizard Ratelimit adds the ability to apply rate limiting directly in [Dropwizard](http://www.dropwizard.io) without any external services.
+Add rate limiting to [Dropwizard](http://www.dropwizard.io) using token buckets.  The buckets are stored in memory using a Guava [LoadingCache](https://google.github.io/guava/releases/21.0/api/docs/com/google/common/cache/LoadingCache.html).
 
 This project uses [bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) and [Hazelcast](https://hazelcast.org).
 
-Pull requests are welcome!
-
 #### How to use
-This project works with Dropwizard 1.0.5.
 
-Add the project to your dependencies. You will also need the following dependencies to your `pom.xml`:
-```
-<dependencies>
-	<dependency>
-		<groupId>com.hazelcast</groupId>
-		<artifactId>hazelcast</artifactId>
-		<version>3.7.5</version>
-	</dependency>
-	<dependency>
-		<groupId>com.hazelcast</groupId>
-		<artifactId>hazelcast-client</artifactId>
-		<version>3.7.5</version>
-	</dependency>
-	<dependency>
-		<groupId>com.github.vladimir-bukhtoyarov</groupId>
-		<artifactId>bucket4j-jcache</artifactId>
-		<version>2.0.0</version>
-	</dependency>
-	<dependency>
-		<groupId>javax.cache</groupId>
-		<artifactId>cache-api</artifactId>
-		<version>1.0.0</version>
-	</dependency>
-</dependencies>
-```
-
-Then, in your Dropwizard initialize method add the following:
+In your Dropwizard initialize method add the following:
 ```
 @Override
 public void initialize(Bootstrap<Configuration> bootstrap) {
+    CacheBuilderSpec cacheBuilderSpec = new CacheBuilderSpec.parse("expireAfterWrite=1m")
+    long overdraft = 50L;
+    Refill refill = Refill.smooth(10, Duration.ofSeconds(5));
 
-	long permitsPerPeriod = 100;
-	long period = 1;
-	TimeUnit timeUnit = TimeUnit.MINUTES;
-
-	RateLimitProvider rateLimitProvider = new HazelcastRateLimitProvider(
-		permitsPerSecond,
-		period,
-		timeUnit
-	);
+	RateLimitProvider rateLimitProvider = new TokenBucketRateLimitProvider(
+	        cacheBuilderSpec, overdraft, refill);
 
 	bootstrap.addBundle(new RateLimitBundle(rateLimitProvider));
 }
@@ -65,5 +31,6 @@ Response getIndex() {
 ```
 
 #### Copyright and License
-Copyright 2017 ZIVVER B.V.
-Licensed under the [MIT License](https://opensource.org/licenses/MIT)
+Adapted from ZIVVER B.V.'s [dropwizard-ratelimit](https://github.com/zivver/dropwizard-ratelimit)
+
+Licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)

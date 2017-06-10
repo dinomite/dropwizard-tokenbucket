@@ -9,7 +9,6 @@ import io.github.bucket4j.Bucket
 import io.github.bucket4j.Bucket4j
 import io.github.bucket4j.Refill
 import net.dinomite.dropwizard.tokenbucket.RateLimitProvider
-import java.time.Duration
 
 class TokenBucketRateLimitProvider constructor(cacheBuilderSpec: CacheBuilderSpec, overdraft: Long,
                                                refill: Refill) : RateLimitProvider {
