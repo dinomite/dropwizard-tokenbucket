@@ -11,17 +11,13 @@ import io.github.bucket4j.Refill
 import net.dinomite.dropwizard.tokenbucket.RateLimitProvider
 import java.time.Duration
 
-class HazelcastRateLimitProvider constructor(cacheBuilderSpec: CacheBuilderSpec, period: Duration) : RateLimitProvider {
-    companion object {
-        val OVERDRAFT = 50L
-        val REFILL: Refill = Refill.smooth(10, Duration.ofSeconds(5))
-    }
-
+class TokenBucketRateLimitProvider constructor(cacheBuilderSpec: CacheBuilderSpec, overdraft: Long,
+                                               refill: Refill) : RateLimitProvider {
     private val buckets: LoadingCache<String, Bucket> = CacheBuilder.from(cacheBuilderSpec)
             .build(object : CacheLoader<String, Bucket>() {
                 override fun load(key: String): Bucket {
                     return Bucket4j.builder()
-                            .addLimit(Bandwidth.classic(OVERDRAFT, REFILL))
+                            .addLimit(Bandwidth.classic(overdraft, refill))
                             .build()
                 }
             })
